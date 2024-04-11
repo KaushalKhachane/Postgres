@@ -10,18 +10,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const pg_1 = require("pg");
+const client = new pg_1.Client({
+    host: 'localhost',
+    port: 5432,
+    database: 'postgres',
+    user: 'postgres',
+    password: 'mysecretpassword',
+});
 // Async function to fetch user data from the database given an email
 function getUser(email) {
     return __awaiter(this, void 0, void 0, function* () {
-        const client = new pg_1.Client({
-            host: 'localhost',
-            port: 5432,
-            database: 'postgres',
-            user: 'postgres',
-            password: 'mysecretpassword',
-        });
         try {
-            yield client.connect(); // Ensure client connection is established
+            yield client.connect();
+            // Ensure client connection is established
             const query = 'SELECT * FROM users WHERE email = $1';
             const values = [email];
             const result = yield client.query(query, values);
@@ -43,5 +44,25 @@ function getUser(email) {
         }
     });
 }
+//insertData
+function insertData(username, email, password) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield client.connect(); // Ensure client connection is established
+            // Use parameterized query to prevent SQL injection
+            const insertQuery = "INSERT INTO users (username, email, password) VALUES ($1, $2, $3)";
+            const values = [username, email, password];
+            const res = yield client.query(insertQuery, values);
+            console.log('Insertion success:', res); // Output insertion result
+        }
+        catch (err) {
+            console.error('Error during the insertion:', err);
+        }
+        finally {
+            yield client.end(); // Close the client connection
+        }
+    });
+}
 // Example usage
-getUser('khachaneks@22@gmail.com').catch(console.error);
+getUser('ritikan018@gmail.com').catch(console.error);
+// insertData('Rishika','ritikan018@gmail.com', "rishika")
